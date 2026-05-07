@@ -49,6 +49,11 @@ def index():
     camera_name = os.environ.get('CAMERA_NAME', 'Main Entrance')
     return render_template('dashboard.html', logs=logs, camera_url=camera_url, camera_name=camera_name)
 
+@main.route('/dashboard')
+@login_required
+def dashboard():
+    return redirect(url_for('main.index'))
+
 @main.route('/logs')
 @login_required
 def logs():

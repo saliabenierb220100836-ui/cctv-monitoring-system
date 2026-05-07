@@ -1,10 +1,18 @@
 from app import db
-from datetime import datetime
-import pytz
+from datetime import datetime, timedelta
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    ZoneInfo = None
+
 
 def get_pht_now():
-    """Returns current time in Philippine Time"""
-    return datetime.now(pytz.timezone('Asia/Manila'))
+    """Returns current time in Philippine Time."""
+    if ZoneInfo is not None:
+        return datetime.now(ZoneInfo('Asia/Manila'))
+    return datetime.now(timedelta(hours=8))
+
 
 class AuditLog(db.Model): # Must be 'AuditLog' to match your main_routes.py import
     id = db.Column(db.Integer, primary_key=True)
