@@ -1,0 +1,24 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="row">
+    <div class="col-md-8">
+        <h3>Live Feed</h3>
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <div class="bg-dark" style="height: 400px; display: flex; align-items: center; justify-content: center;">
+                    <p class="text-muted">Camera Stream Loading...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <h3>System Logs</h3>
+        <div class="card">
+            <ul class="list-group list-group-flush">
+                <li class="list-group-item bg-dark text-success">11:14:00 - Motion Detected: Front Door</li>
+                <li class="list-group-item bg-dark text-white">11:10:00 - System Heartbeat OK</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}

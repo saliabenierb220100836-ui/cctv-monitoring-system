@@ -1,7 +1,8 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
 
+# Define the blueprint
 main = Blueprint('main', __name__)
 
 @main.route('/')
-def home():
-    return "CCTV Monitoring System Running"
+def index():
+    return render_template('dashboard.html')
