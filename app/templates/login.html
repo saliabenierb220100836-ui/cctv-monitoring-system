@@ -2,7 +2,7 @@
 {% block body_class %}login-page{% endblock %}
 {% block content %}
 <div class="login-container">
-    <div class="card login-card bg-white">
+    <div class="card login-card">
         <div class="card-body">
             <div class="mb-4 text-center">
                 <h1 class="login-title">KAFKAM LOGIN</h1>
@@ -11,7 +11,7 @@
             {% with messages = get_flashed_messages(with_categories=true) %}
                 {% if messages %}
                     <div class="mb-4">
-                        {% for category, message in messages %}
+                        {% for category, message in messages|unique %}
                             <div class="alert alert-danger" role="alert">{{ message }}</div>
                         {% endfor %}
                     </div>
