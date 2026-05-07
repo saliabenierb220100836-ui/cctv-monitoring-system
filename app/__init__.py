@@ -9,16 +9,15 @@ login_manager = LoginManager()
 
 def create_app():
     app = Flask(__name__)
-
     app.config.from_object(Config)
-    db.init_app(app)
 
+    db.init_app(app)
     login_manager.init_app(app)
+
     
+    from app.models import User 
+
     from app.routes.main_routes import main
     app.register_blueprint(main)
-
-    from app.models.user import User
-    from app.models.log import AuditLog
 
     return app
