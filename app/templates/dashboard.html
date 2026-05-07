@@ -2,49 +2,93 @@
 {% block title %}Main Feed{% endblock %}
 
 {% block content %}
-<div class="flex justify-between items-center mb-6">
-    <p class="text-slate-500 text-sm font-medium">Monitoring 1 active camera</p>
-    <div class="flex items-center gap-2 text-[11px] font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
-        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> LIVE FEED
+<div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
+    <div>
+        <p class="text-slate-500 text-sm font-medium">Monitoring <span id="camera-count">1</span> active camera</p>
+        <h1 class="text-3xl font-bold text-slate-900 mt-1">Main Feed</h1>
+    </div>
+    <div id="feed-status-pill" class="inline-flex items-center gap-2 text-[11px] font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+        <span id="feed-status-label">LIVE FEED</span>
     </div>
 </div>
 
-<div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-    <div class="relative aspect-video bg-[#050505] flex items-center justify-center group">
-        <div class="absolute top-5 left-5 z-10 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded flex items-center gap-1.5 shadow-lg">
-            <span class="w-1.5 h-1.5 bg-white rounded-full"></span> REC
+<div class="max-w-5xl mx-auto bg-white rounded-3xl shadow-xl border border-slate-200 overflow-hidden">
+    <div class="relative aspect-video bg-slate-950 flex items-center justify-center overflow-hidden">
+        <div class="absolute top-5 left-5 z-10 bg-red-600 text-white text-[10px] font-black px-3 py-2 rounded-md flex items-center gap-2 shadow-lg">
+            <span class="w-2 h-2 bg-white rounded-full"></span> REC
         </div>
 
-        <img id="camera-frame" 
-             src="{{ camera_url }}" 
-             class="w-full h-full object-contain"
-             onerror="this.style.display='none'; document.getElementById('offline-ui').classList.remove('hidden');">
+        <img id="camera-frame"
+             src="{{ camera_url }}"
+             class="w-full h-full object-cover"
+             onload="setCameraOnline(true)"
+             onerror="setCameraOnline(false)">
 
-        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <div class="text-white/20 text-center">
-                <span class="text-5xl mb-2 block">📹</span>
-                <p class="text-xs uppercase tracking-[0.3em] font-semibold">Live Feed Active</p>
+        <div id="live-overlay" class="absolute inset-0 flex flex-col items-center justify-center text-center pointer-events-none">
+            <div class="text-white/20">
+                <span class="text-6xl mb-3 block">📹</span>
+                <p class="text-xs uppercase tracking-[0.32em] font-semibold">Live Feed Active</p>
             </div>
         </div>
 
-        <div id="offline-ui" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-900">
+        <div id="offline-ui" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-950/95 px-6 text-center">
             <div class="bg-red-500/10 p-6 rounded-full mb-4">
-                <span class="text-4xl">📡</span>
+                <span class="text-5xl">📡</span>
             </div>
-            <p class="text-white font-bold text-lg">IP CAM NOT LIVE</p>
-            <p class="text-slate-500 text-sm mt-1">Check Network Switch or Router Connection</p>
+            <p class="text-white font-bold text-xl">NOT LIVE</p>
+            <p id="offline-message" class="text-slate-400 text-sm mt-2">Camera not found or network is down.</p>
             <button onclick="location.reload()" class="mt-6 text-xs bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700">Retry Connection</button>
         </div>
     </div>
 
-    <div class="p-6 bg-white flex justify-between items-center border-t border-slate-50">
+    <div class="p-6 bg-white flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 border-t border-slate-100">
         <div>
             <h3 class="font-bold text-slate-900 text-xl">{{ camera_name }}</h3>
-            <p class="text-slate-400 text-sm">Main Entrance • Subnet 192.168.1.x</p>
+            <p class="text-slate-400 text-sm">Main Entrance</p>
         </div>
-        <div class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-100 font-bold text-[11px]">
+        <div id="camera-state-pill" class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-100 font-bold text-[11px]">
             📶 ONLINE
         </div>
     </div>
 </div>
+
+<script>
+    function setCameraOnline(isOnline) {
+        const offlineUi = document.getElementById('offline-ui');
+        const statusPill = document.getElementById('feed-status-pill');
+        const statusLabel = document.getElementById('feed-status-label');
+        const cameraCount = document.getElementById('camera-count');
+        const cameraState = document.getElementById('camera-state-pill');
+        const liveOverlay = document.getElementById('live-overlay');
+        const cameraFrame = document.getElementById('camera-frame');
+
+        if (isOnline) {
+            offlineUi.classList.add('hidden');
+            liveOverlay.classList.remove('hidden');
+            cameraFrame.style.display = 'block';
+            statusPill.className = 'inline-flex items-center gap-2 text-[11px] font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100';
+            statusLabel.textContent = 'LIVE FEED';
+            cameraState.className = 'flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-100 font-bold text-[11px]';
+            cameraState.textContent = '📶 ONLINE';
+            cameraCount.textContent = '1';
+        } else {
+            offlineUi.classList.remove('hidden');
+            liveOverlay.classList.add('hidden');
+            cameraFrame.style.display = 'none';
+            statusPill.className = 'inline-flex items-center gap-2 text-[11px] font-bold text-amber-700 bg-amber-50 px-3 py-1 rounded-full border border-amber-100';
+            statusLabel.textContent = 'NOT LIVE';
+            cameraState.className = 'flex items-center gap-2 bg-slate-100 text-slate-700 px-3 py-1.5 rounded-lg border border-slate-200 font-bold text-[11px]';
+            cameraState.textContent = '📶 OFFLINE';
+            cameraCount.textContent = '0';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', function() {
+        const cameraFrame = document.getElementById('camera-frame');
+        if (cameraFrame.complete) {
+            setCameraOnline(cameraFrame.naturalWidth > 0);
+        }
+    });
+</script>
 {% endblock %}
