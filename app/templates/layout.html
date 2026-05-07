@@ -34,7 +34,7 @@
             </div>
 
             <nav class="flex-1 px-4 space-y-1">
-                <a href="{{ url_for('main.index') }}" class="flex items-center gap-3 p-3 rounded-lg transition text-sm {% if request.endpoint == 'main.index' %}bg-slate-800 text-white{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
+                <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-3 p-3 rounded-lg transition text-sm {% if request.endpoint == 'main.dashboard' %}bg-slate-800 text-white{% else %}text-slate-300 hover:bg-slate-800{% endif %}">
                     <span class="opacity-70">📹</span> Main Feed
                 </a>
                 <a href="{{ url_for('main.logs') }}" class="flex items-center gap-3 p-3 rounded-lg transition text-sm {% if request.endpoint == 'main.logs' %}bg-slate-800 text-white{% else %}text-slate-300 hover:bg-slate-800{% endif %}">

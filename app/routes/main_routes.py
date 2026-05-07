@@ -27,9 +27,6 @@ def check_camera_live(camera_url, timeout=3):
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-        
     if request.method == 'POST':
         username = request.form.get('username') 
         password = request.form.get('password')
@@ -49,7 +46,7 @@ def login():
             db.session.add(new_log)
             db.session.commit()
             
-            return redirect(url_for('main.index'))
+            return redirect(url_for('main.dashboard'))
         else:
             flash('Invalid username or password', 'error')
 
@@ -59,9 +56,12 @@ def login():
     return response
 
 @main.route('/')
+def home():
+    return redirect(url_for('main.login'))
+
+@main.route('/dashboard')
 @login_required
-def index():
-    # Only show the latest 5 logs for the dashboard "Recent Activity"
+def dashboard():
     logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(5).all()
     camera_url = os.environ.get('CAMERA_URL', 'http://192.168.1.10/snapshot.jpg')
     camera_name = os.environ.get('CAMERA_NAME', 'Main Entrance')
@@ -74,11 +74,6 @@ def index():
         camera_name=camera_name,
         camera_online=camera_online
     )
-
-@main.route('/dashboard')
-@login_required
-def dashboard():
-    return redirect(url_for('main.index'))
 
 @main.route('/logs')
 @login_required

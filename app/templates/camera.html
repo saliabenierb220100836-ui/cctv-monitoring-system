@@ -9,7 +9,7 @@
                     <h1 class="h4 text-white">{{ camera_name }}</h1>
                     <p class="text-muted mb-0">Live IP camera feed from your local network switch/router.</p>
                 </div>
-                <a href="{{ url_for('main.index') }}" class="btn btn-outline-light btn-sm">Back to Dashboard</a>
+                <a href="{{ url_for('main.dashboard') }}" class="btn btn-outline-light btn-sm">Back to Dashboard</a>
             </div>
             <div class="ratio ratio-16x9" style="background:#000; border-radius:20px; overflow:hidden;">
                 <img id="cam" src="{{ camera_url }}" alt="{{ camera_name }}" style="width:100%; height:100%; object-fit:cover;" />
