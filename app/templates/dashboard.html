@@ -1,80 +1,50 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+{% block title %}Main Feed{% endblock %}
 
 {% block content %}
-<div class="row gx-4 gy-4 mt-3">
-    <div class="col-lg-8">
-        <div class="card p-4 mb-4" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08);">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <div>
-                    <h2 class="h4 text-white">Live Camera Feed</h2>
-                    <p class="text-muted mb-0">Showing your IP camera over the LAN / router network.</p>
-                </div>
-                <a href="{{ url_for('main.camera') }}" class="btn btn-outline-light btn-sm">Full Camera View</a>
-            </div>
-            <div class="ratio ratio-16x9" style="background:#000; border-radius:20px; overflow:hidden;">
-                <img id="camera-feed" src="{{ camera_url }}" alt="{{ camera_name }}" style="width:100%; height:100%; object-fit:cover; display:block;" />
-            </div>
-            <div class="mt-3 text-muted">
-                <small>Camera URL: <code>{{ camera_url }}</code></small>
-            </div>
-        </div>
-        <div class="card p-4" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08);">
-            <div class="mb-3">
-                <h2 class="h4 text-white">Recent Activity Logs</h2>
-                <p class="text-muted mb-0">Latest security and login events from the monitoring system.</p>
-            </div>
-            <ul class="list-group list-group-flush">
-                {% for log in logs %}
-                <li class="list-group-item bg-transparent text-white border-secondary py-3">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong class="text-white">{{ log.action }}</strong>
-                            <div class="text-muted small">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</div>
-                        </div>
-                        <span class="badge bg-secondary">{{ log.ip_address }}</span>
-                    </div>
-                </li>
-                {% else %}
-                <li class="list-group-item bg-transparent text-white border-secondary py-3">
-                    <div class="text-muted">No activity logs yet.</div>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
-    <div class="col-lg-4">
-        <div class="card p-4 mb-4" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08);">
-            <h2 class="h5 text-white mb-3">System Dashboard</h2>
-            <div class="mb-3">
-                <p class="mb-1 text-muted">Camera</p>
-                <h3 class="text-white">{{ camera_name }}</h3>
-            </div>
-            <div class="mb-3">
-                <p class="mb-1 text-muted">Network</p>
-                <p class="text-white">LAN / Router-connected IP camera</p>
-            </div>
-            <div class="mb-3">
-                <p class="mb-1 text-muted">Refresh Interval</p>
-                <p class="text-white">1 second snapshot reload</p>
-            </div>
-            <a href="{{ url_for('main.camera') }}" class="btn btn-light w-100">Open Full Camera View</a>
-        </div>
-        <div class="card p-4" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08);">
-            <h2 class="h5 text-white mb-3">Tips</h2>
-            <ul class="list-unstyled text-muted small">
-                <li class="mb-2">• Ensure the camera IP is reachable from the server machine.</li>
-                <li class="mb-2">• Use the actual snapshot or MJPEG URL your camera provides.</li>
-                <li>• If your camera is behind a router, the server must have access to the same LAN or VPN.</li>
-            </ul>
-        </div>
+<div class="flex justify-between items-center mb-6">
+    <p class="text-slate-500 text-sm font-medium">Monitoring 1 active camera</p>
+    <div class="flex items-center gap-2 text-[11px] font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full border border-green-100">
+        <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span> LIVE FEED
     </div>
 </div>
 
-<script>
-    function refreshCamera() {
-        const feed = document.getElementById('camera-feed');
-        feed.src = '{{ camera_url }}' + '?t=' + Date.now();
-    }
-    setInterval(refreshCamera, 1000);
-</script>
+<div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="relative aspect-video bg-[#050505] flex items-center justify-center group">
+        <div class="absolute top-5 left-5 z-10 bg-red-600 text-white text-[10px] font-black px-2 py-1 rounded flex items-center gap-1.5 shadow-lg">
+            <span class="w-1.5 h-1.5 bg-white rounded-full"></span> REC
+        </div>
+
+        <img id="camera-frame" 
+             src="{{ camera_url }}" 
+             class="w-full h-full object-contain"
+             onerror="this.style.display='none'; document.getElementById('offline-ui').classList.remove('hidden');">
+
+        <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <div class="text-white/20 text-center">
+                <span class="text-5xl mb-2 block">📹</span>
+                <p class="text-xs uppercase tracking-[0.3em] font-semibold">Live Feed Active</p>
+            </div>
+        </div>
+
+        <div id="offline-ui" class="hidden absolute inset-0 flex flex-col items-center justify-center bg-slate-900">
+            <div class="bg-red-500/10 p-6 rounded-full mb-4">
+                <span class="text-4xl">📡</span>
+            </div>
+            <p class="text-white font-bold text-lg">IP CAM NOT LIVE</p>
+            <p class="text-slate-500 text-sm mt-1">Check Network Switch or Router Connection</p>
+            <button onclick="location.reload()" class="mt-6 text-xs bg-slate-800 text-white px-4 py-2 rounded-lg hover:bg-slate-700">Retry Connection</button>
+        </div>
+    </div>
+
+    <div class="p-6 bg-white flex justify-between items-center border-t border-slate-50">
+        <div>
+            <h3 class="font-bold text-slate-900 text-xl">{{ camera_name }}</h3>
+            <p class="text-slate-400 text-sm">Main Entrance • Subnet 192.168.1.x</p>
+        </div>
+        <div class="flex items-center gap-2 bg-green-50 text-green-700 px-3 py-1.5 rounded-lg border border-green-100 font-bold text-[11px]">
+            📶 ONLINE
+        </div>
+    </div>
+</div>
 {% endblock %}

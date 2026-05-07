@@ -3,95 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CCTV Dashboard</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: radial-gradient(circle at top left, #1b3a70 0%, #0f1f4e 35%, #07132a 100%);
-            color: #1f2937;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        .navbar {
-            background-color: transparent;
-            border-bottom: none;
-        }
-        .card {
-            border-radius: 24px;
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.18);
-        }
-        .login-card {
-            max-width: 420px;
-            border: none;
-            border-radius: 28px;
-            overflow: hidden;
-        }
-        .login-card .card-body {
-            padding: 2rem 2.25rem;
-        }
-        .login-title {
-            font-size: 1.8rem;
-            font-weight: 700;
-        }
-        .login-subtitle {
-            color: #6b7280;
-            margin-bottom: 1.75rem;
-        }
-        .form-control {
-            border-radius: 16px;
-            border: 1px solid #d2d6dc;
-            background: #f8fafc;
-            color: #111827;
-            padding: 1rem 1.1rem;
-        }
-        .form-control:focus {
-            border-color: #1d4ed8;
-            box-shadow: 0 0 0 0.2rem rgba(59, 130, 246, 0.16);
-        }
-        .form-label {
-            font-weight: 600;
-            color: #374151;
-        }
-        .btn-login {
-            border-radius: 16px;
-            padding: 0.95rem 1rem;
-            font-weight: 700;
-        }
-        .login-footer {
-            color: #6b7280;
-        }
-        .login-footer a {
-            color: #1d4ed8;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        .login-container {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 2rem;
-        }
-        body.login-page .navbar,
-        body.login-page .container-fluid > .row {
-            display: none !important;
-        }
-        body.login-page .login-container {
-            min-height: 100vh;
-        }
-    </style>
+    <title>KAFKAM - CCTV</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body class="{% block body_class %}{% endblock %}">
-    <nav class="navbar navbar-dark mb-4">
-        <div class="container-fluid">
-            <span class="navbar-brand mb-0 h1">🛡️ CCTV Monitoring System</span>
-            <div class="d-flex">
-                <span class="badge bg-success">System Online</span>
+<body class="bg-[#f8fafc]">
+    <div class="flex min-h-screen">
+        <aside class="w-64 bg-[#0f172a] text-slate-300 flex flex-col fixed h-full shadow-xl">
+            <div class="p-8">
+                <h1 class="text-2xl font-bold text-white tracking-tight">KAFKAM</h1>
+                <p class="text-[10px] text-slate-500 uppercase tracking-[0.2em] mt-1">Monitoring System</p>
             </div>
-        </div>
-    </nav>
 
-    <div class="container-fluid">
-        {% block content %}{% endblock %}
+            <nav class="flex-1 px-4 space-y-1">
+                <a href="{{ url_for('main.dashboard') }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800 transition text-sm">
+                    <span class="opacity-70">📹</span> Main Feed
+                </a>
+                <a href="{{ url_for('main.logs') }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800 transition text-sm">
+                    <span class="opacity-70">📋</span> Activity Logs
+                </a>
+                <a href="{{ url_for('main.settings') }}" class="flex items-center gap-3 p-3 rounded-lg hover:bg-slate-800 transition text-sm">
+                    <span class="opacity-70">⚙️</span> Settings
+                </a>
+            </nav>
+
+            <div class="p-6 border-t border-slate-800 bg-[#0c1425]">
+                <p class="text-[10px] text-slate-500 uppercase mb-1">Logged in as</p>
+                <p class="text-white font-bold text-sm mb-4">{{ current_user.username }}</p>
+                <a href="{{ url_for('auth.logout') }}" class="flex items-center gap-2 text-xs font-semibold text-slate-400 hover:text-white transition">
+                    <span>↪</span> Logout
+                </a>
+            </div>
+        </aside>
+
+        <main class="ml-64 flex-1">
+            <header class="bg-white border-b border-slate-200 p-6 flex justify-between items-center">
+                <h2 class="text-xl font-bold text-[#0f172a]">{% block title %}{% endblock %}</h2>
+                <div class="text-xs text-slate-400 font-medium">Philippine Standard Time (PHT)</div>
+            </header>
+            <div class="p-8">
+                {% block content %}{% endblock %}
+            </div>
+        </main>
     </div>
 </body>
 </html>

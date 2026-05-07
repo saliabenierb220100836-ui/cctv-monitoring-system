@@ -5,7 +5,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(150), unique=True, nullable=False)
-    # Rename 'password' to 'password_hash' to be clear
     password_hash = db.Column(db.String(255), nullable=False)
 
     def set_password(self, password):

@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block title %}Settings{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl space-y-6">
+    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-2xl text-slate-400">👤</span>
+            <h3 class="text-lg font-bold text-slate-800">Account Information</h3>
+        </div>
+        
+        <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Username</label>
+        <div class="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-medium">
+            {{ current_user.username }}
+        </div>
+    </div>
+
+    <div class="bg-white p-8 rounded-2xl shadow-sm border border-slate-200">
+        <div class="flex items-center gap-3 mb-6">
+            <span class="text-2xl text-slate-400">🔒</span>
+            <h3 class="text-lg font-bold text-slate-800">Change Password</h3>
+        </div>
+        
+        <form action="/update-password" method="POST" class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">Current Password</label>
+                <input type="password" placeholder="Enter current password" class="w-full p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase mb-2">New Password</label>
+                <input type="password" placeholder="Enter new password" class="w-full p-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition">
+            </div>
+            <button class="w-full bg-[#0f172a] text-white font-bold py-3 rounded-xl hover:bg-slate-800 transition">Update Security</button>
+        </form>
+    </div>
+</div>
+{% endblock %}

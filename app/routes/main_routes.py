@@ -2,58 +2,59 @@ import os
 from flask import render_template, redirect, url_for, request, flash, Blueprint, make_response, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User  
-from app.models.log import AuditLog # Import your log model
+from app.models.log import AuditLog 
 from app import db                
 
 main = Blueprint('main', __name__)
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+        
     if request.method == 'POST':
         username = request.form.get('username') 
         password = request.form.get('password')
         user = User.query.filter_by(username=username).first()
         
-        # Use the new check_password method
         if user and user.check_password(password):
             session.permanent = False
             login_user(user, remember=False)
             
-            # --- ADD REAL LOG HERE ---
-            new_log = AuditLog(action=f"User {username} logged in", ip_address=request.remote_addr)
+            # --- IMPROVED LOGGING ---
+            # We record 'Login' as the action and link the user_id for the sidebar/table
+            new_log = AuditLog(
+                action="Login", 
+                ip_address=request.remote_addr,
+                user_id=user.id 
+            )
             db.session.add(new_log)
             db.session.commit()
             
             return redirect(url_for('main.index'))
         else:
             flash('Invalid username or password', 'error')
+
     response = make_response(render_template('login.html'))
+    # Prevent back-button access after logout
     response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
     return response
 
 @main.route('/')
 @login_required
 def index():
-    # Fetch real logs from DB to show on dashboard
-    logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(10).all()
+    # Only show the latest 5 logs for the dashboard "Recent Activity"
+    logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(5).all()
     camera_url = os.environ.get('CAMERA_URL', 'http://192.168.1.10/snapshot.jpg')
-    camera_name = os.environ.get('CAMERA_NAME', 'IP Camera')
+    camera_name = os.environ.get('CAMERA_NAME', 'Main Entrance')
     return render_template('dashboard.html', logs=logs, camera_url=camera_url, camera_name=camera_name)
-
-@main.route('/camera')
-@login_required
-def camera():
-    camera_url = os.environ.get('CAMERA_URL', 'http://192.168.1.10/snapshot.jpg')
-    camera_name = os.environ.get('CAMERA_NAME', 'IP Camera')
-    return render_template('camera.html', camera_url=camera_url, camera_name=camera_name)
 
 @main.route('/logs')
 @login_required
 def logs():
-    logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).all()
-    return render_template('logs.html', logs=logs)
+    # Full list for the Activity Logs page
+    all_logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).all()
+    return render_template('logs.html', logs=all_logs)
 
 @main.route('/settings')
 @login_required
@@ -61,22 +62,25 @@ def settings():
     return render_template('settings.html')
 
 @main.route('/logout')
+@login_required # Added this to ensure we have a current_user to log
 def logout():
+    # --- LOG THE LOGOUT EVENT ---
+    new_log = AuditLog(
+        action="Logout", 
+        ip_address=request.remote_addr,
+        user_id=current_user.id
+    )
+    db.session.add(new_log)
+    db.session.commit()
+    
     logout_user()
-    response = make_response(redirect(url_for('main.login')))
-    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
-    response.headers['Pragma'] = 'no-cache'
-    response.headers['Expires'] = '0'
-    return response
+    return redirect(url_for('main.login'))
 
-# Update your setup route to use hashing
+# Database Setup
 @main.route('/setup-database-xyz')
 def setup_database():
     try:
-        # --- ADD THIS LINE TEMPORARILY ---
         db.drop_all() 
-        
-        # Now create the new structure
         db.create_all() 
         
         if not User.query.filter_by(username='felicity').first():
@@ -84,7 +88,6 @@ def setup_database():
             admin.set_password('bernabe')
             db.session.add(admin)
             db.session.commit()
-            return "<h1>SUCCESS</h1><p>Database wiped and recreated. User 'felicity' created.</p>"
-        return "<h1>NOTICE</h1><p>Setup already complete.</p>"
+            return "<h1>SUCCESS</h1><p>Database recreated. User 'felicity' created.</p>"
     except Exception as e:
         return f"<h1>ERROR</h1><p>{str(e)}</p>"

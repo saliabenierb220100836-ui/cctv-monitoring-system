@@ -1,0 +1,43 @@
+{% extends "layout.html" %}
+{% block title %}Activity Logs{% endblock %}
+
+{% block content %}
+<div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="p-4 bg-slate-50 border-b border-slate-200 flex gap-4">
+        <input type="text" placeholder="Search by username or IP address..." 
+               class="flex-1 p-2 bg-white border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <select class="p-2 bg-white border border-slate-300 rounded-lg text-sm outline-none">
+            <option>All Actions</option>
+            <option>Login</option>
+            <option>Logout</option>
+        </select>
+    </div>
+
+    <table class="w-full text-left">
+        <thead class="bg-[#0f172a] text-white text-[11px] uppercase tracking-wider">
+            <tr>
+                <th class="p-4 font-semibold">Username</th>
+                <th class="p-4 font-semibold">Action</th>
+                <th class="p-4 font-semibold">Timestamp</th>
+                <th class="p-4 font-semibold">IP Address</th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100 text-sm">
+            {% for log in logs %}
+            <tr class="hover:bg-slate-50 transition">
+                <td class="p-4 font-bold text-slate-800">{{ log.user.username }}</td>
+                <td class="p-4">
+                    {% if log.action == 'Login' %}
+                    <span class="text-green-600 bg-green-50 px-3 py-1 rounded-md text-[10px] font-bold">→ LOGIN</span>
+                    {% else %}
+                    <span class="text-orange-600 bg-orange-50 px-3 py-1 rounded-md text-[10px] font-bold">← LOGOUT</span>
+                    {% endif %}
+                </td>
+                <td class="p-4 text-slate-500 font-medium">{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                <td class="p-4 text-slate-400 font-mono tracking-tighter">{{ log.ip_address }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
