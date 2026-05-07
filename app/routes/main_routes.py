@@ -49,6 +49,17 @@ def camera():
     camera_name = os.environ.get('CAMERA_NAME', 'IP Camera')
     return render_template('camera.html', camera_url=camera_url, camera_name=camera_name)
 
+@main.route('/logs')
+@login_required
+def logs():
+    logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).all()
+    return render_template('logs.html', logs=logs)
+
+@main.route('/settings')
+@login_required
+def settings():
+    return render_template('settings.html')
+
 @main.route('/logout')
 def logout():
     logout_user()

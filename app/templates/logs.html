@@ -1,0 +1,59 @@
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="content-header">
+    <div>
+        <h1>Activity Logs</h1>
+        <p>All recorded user events and system activity.</p>
+    </div>
+    <a href="{{ url_for('main.index') }}" class="btn btn-outline-light btn-sm">Back to Dashboard</a>
+</div>
+
+<div class="panel-card">
+    <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <div class="panel-title">Audit Trail</div>
+                <p class="text-muted mb-0">Monitor all login, logout, and user events.</p>
+            </div>
+            <span class="badge bg-secondary">{{ logs|length }} entries</span>
+        </div>
+
+        <div class="table-responsive">
+            <table class="table table-borderless table-striped mb-0">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Action</th>
+                        <th>Timestamp</th>
+                        <th>IP Address</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for log in logs %}
+                    <tr>
+                        <td>{{ log.username or 'unknown' }}</td>
+                        <td>
+                            {% if 'Login' in log.action %}
+                                <span class="badge bg-success">Login</span>
+                            {% elif 'Logout' in log.action %}
+                                <span class="badge bg-danger">Logout</span>
+                            {% else %}
+                                <span class="badge bg-secondary">Event</span>
+                            {% endif %}
+                            {{ log.action }}
+                        </td>
+                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ log.ip_address }}</td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="text-muted">No activity logs available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
