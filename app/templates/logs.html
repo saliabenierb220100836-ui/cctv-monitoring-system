@@ -43,7 +43,7 @@
                             {% endif %}
                             {{ log.action }}
                         </td>
-                        <td>{{ log.timestamp.strftime('%Y-%m-%d %H:%M:%S') }}</td>
+                        <td>{{ log.timestamp|ph_time }}</td>
                         <td>{{ log.ip_address }}</td>
                     </tr>
                     {% else %}
