@@ -57,12 +57,14 @@
                     <div class="text-xs text-slate-400 font-medium">Philippine Standard Time (PHT)</div>
                 </header>
                 <div class="p-8">
-                    {% block content %}{% endblock %}
-                </div>
             {% else %}
                 <div class="min-h-screen flex items-center justify-center p-6 bg-[#0f172a]">
                     <div class="w-full max-w-md">
+            {% endif %}
                         {% block content %}{% endblock %}
+            {% if current_user.is_authenticated %}
+                </div>
+            {% else %}
                     </div>
                 </div>
             {% endif %}
