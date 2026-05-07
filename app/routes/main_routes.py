@@ -1,4 +1,6 @@
 import os
+import urllib.request
+import urllib.error
 from flask import render_template, redirect, url_for, request, flash, Blueprint, make_response, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User  
@@ -6,6 +8,22 @@ from app.models.log import AuditLog
 from app import db                
 
 main = Blueprint('main', __name__)
+
+
+def check_camera_live(camera_url, timeout=3):
+    if not camera_url:
+        return False
+
+    try:
+        request_obj = urllib.request.Request(camera_url, headers={
+            'User-Agent': 'Mozilla/5.0',
+            'Accept': 'image/webp,image/apng,image/*,*/*;q=0.8'
+        })
+        with urllib.request.urlopen(request_obj, timeout=timeout) as response:
+            return response.status == 200
+    except (urllib.error.URLError, urllib.error.HTTPError, ValueError):
+        return False
+
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
@@ -47,7 +65,15 @@ def index():
     logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(5).all()
     camera_url = os.environ.get('CAMERA_URL', 'http://192.168.1.10/snapshot.jpg')
     camera_name = os.environ.get('CAMERA_NAME', 'Main Entrance')
-    return render_template('dashboard.html', logs=logs, camera_url=camera_url, camera_name=camera_name)
+    camera_online = check_camera_live(camera_url)
+
+    return render_template(
+        'dashboard.html',
+        logs=logs,
+        camera_url=camera_url,
+        camera_name=camera_name,
+        camera_online=camera_online
+    )
 
 @main.route('/dashboard')
 @login_required
