@@ -19,8 +19,7 @@ def login():
             session.permanent = False
             login_user(user, remember=False)
             
-            # --- ADD REAL LOG HERE ---
-            new_log = AuditLog(action=f"User {username} logged in", ip_address=request.remote_addr)
+            new_log = AuditLog(username=user.username, action=f"User {user.username} logged in", ip_address=request.remote_addr)
             db.session.add(new_log)
             db.session.commit()
             

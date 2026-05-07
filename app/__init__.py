@@ -1,5 +1,9 @@
-from datetime import datetime
-from zoneinfo import ZoneInfo
+from datetime import datetime, timedelta
+
+try:
+    from zoneinfo import ZoneInfo
+except ImportError:
+    ZoneInfo = None
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
@@ -20,8 +24,13 @@ def format_ph_time(value, fmt='%Y-%m-%d %H:%M:%S'):
     if not isinstance(value, datetime):
         return value
     if value.tzinfo is None:
-        value = value.replace(tzinfo=ZoneInfo('UTC'))
-    return value.astimezone(ZoneInfo('Asia/Manila')).strftime(fmt)
+        return value.strftime(fmt)
+    if ZoneInfo:
+        try:
+            return value.astimezone(ZoneInfo('Asia/Manila')).strftime(fmt)
+        except Exception:
+            pass
+    return (value + timedelta(hours=8)).strftime(fmt)
 
 
 def create_app():
