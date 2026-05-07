@@ -1,3 +1,10 @@
+from flask import render_template, redirect, url_for, request, flash, Blueprint
+from flask_login import login_user, logout_user, login_required
+from app.models.user import User  
+from app import db                
+
+main = Blueprint('main', __name__)
+
 @main.route('/setup-database-xyz')
 def setup_database():
     try:
