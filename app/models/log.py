@@ -1,21 +1,6 @@
 from app import db
 from datetime import datetime
 
-try:
-    from zoneinfo import ZoneInfo
-except ImportError:
-    ZoneInfo = None
-
-
-def manila_now():
-    if ZoneInfo:
-        try:
-            return datetime.now(ZoneInfo('Asia/Manila'))
-        except Exception:
-            pass
-    return datetime.now()
-
-
 class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
@@ -27,5 +12,5 @@ class AuditLog(db.Model):
 
     timestamp = db.Column(
         db.DateTime,
-        default=manila_now
+        default=datetime.utcnow
     )
