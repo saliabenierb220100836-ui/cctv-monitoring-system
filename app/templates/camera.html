@@ -1,17 +1,34 @@
-<!DOCTYPE html>
-<html>
-<head><title>CCTV Dashboard</title></head>
-<body>
-  <h1>Live Camera Feed</h1>
-  <img id="cam" src="" style="width:640px;">
-  <script>
+{% extends 'layout.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-4">
+    <div class="col-xl-10">
+        <div class="card p-4" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.08);">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h1 class="h4 text-white">{{ camera_name }}</h1>
+                    <p class="text-muted mb-0">Live IP camera feed from your local network switch/router.</p>
+                </div>
+                <a href="{{ url_for('main.index') }}" class="btn btn-outline-light btn-sm">Back to Dashboard</a>
+            </div>
+            <div class="ratio ratio-16x9" style="background:#000; border-radius:20px; overflow:hidden;">
+                <img id="cam" src="{{ camera_url }}" alt="{{ camera_name }}" style="width:100%; height:100%; object-fit:cover;" />
+            </div>
+            <div class="mt-3 text-muted">
+                <p class="mb-1">Camera source:</p>
+                <code>{{ camera_url }}</code>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
     function refresh() {
-      document.getElementById('cam').src =
-        'http://192.168.1.10/snapshot.jpg?t='
-        + Date.now();
+        const cam = document.getElementById('cam');
+        cam.src = '{{ camera_url }}' + '?t=' + Date.now();
     }
     setInterval(refresh, 1000);
     refresh();
-  </script>
-</body>
-</html>
+</script>
+{% endblock %}
+

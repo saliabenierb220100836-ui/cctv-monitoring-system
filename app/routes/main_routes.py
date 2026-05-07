@@ -1,3 +1,4 @@
+import os
 from flask import render_template, redirect, url_for, request, flash, Blueprint, make_response, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User  
@@ -37,7 +38,16 @@ def login():
 def index():
     # Fetch real logs from DB to show on dashboard
     logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(10).all()
-    return render_template('dashboard.html', logs=logs)
+    camera_url = os.environ.get('CAMERA_URL', 'http://192.168.1.10/snapshot.jpg')
+    camera_name = os.environ.get('CAMERA_NAME', 'IP Camera')
+    return render_template('dashboard.html', logs=logs, camera_url=camera_url, camera_name=camera_name)
+
+@main.route('/camera')
+@login_required
+def camera():
+    camera_url = os.environ.get('CAMERA_URL', 'http://192.168.1.10/snapshot.jpg')
+    camera_name = os.environ.get('CAMERA_NAME', 'IP Camera')
+    return render_template('camera.html', camera_url=camera_url, camera_name=camera_name)
 
 @main.route('/logout')
 def logout():
