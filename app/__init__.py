@@ -15,6 +15,8 @@ def create_app():
     app = Flask(__name__)  # No spaces before 'app'
     app.config.from_object(Config)
 
+    app.jinja_env.cache = {}
+
     db.init_app(app)
     login_manager.init_app(app)
     

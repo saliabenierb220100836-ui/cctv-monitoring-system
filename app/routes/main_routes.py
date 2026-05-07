@@ -23,9 +23,13 @@ def login():
             db.session.commit()
             
             return redirect(url_for('main.index'))
-        
-        flash('Login Unsuccessful.', 'danger')
-    return render_template('login.html')
+        else:
+            flash('Invalid username or password', 'error')
+    response = render_template('login.html')
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 @main.route('/')
 @login_required
