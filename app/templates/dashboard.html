@@ -1,23 +1,38 @@
 {% extends "layout.html" %}
 {% block content %}
 <div class="row">
-    <div class="col-md-8">
-        <h3>Live Feed</h3>
-        <div class="card mb-4">
-            <div class="card-body text-center">
-                <div class="bg-dark" style="height: 400px; display: flex; align-items: center; justify-content: center;">
-                    <p class="text-muted">Camera Stream Loading...</p>
+    <div class="col-lg-9">
+        <div class="row">
+            {% for i in range(1, 5) %}
+            <div class="col-md-6 mb-4">
+                <div class="card">
+                    <div class="card-header py-1">Camera 0{{ i }} - Live</div>
+                    <div class="video-placeholder">
+                        <span class="cam-label text-danger">● REC</span>
+                        <p class="text-muted small">Connecting to stream...</p>
+                    </div>
                 </div>
             </div>
+            {% endfor %}
         </div>
     </div>
-    <div class="col-md-4">
-        <h3>System Logs</h3>
-        <div class="card">
-            <ul class="list-group list-group-flush">
-                <li class="list-group-item bg-dark text-success">11:14:00 - Motion Detected: Front Door</li>
-                <li class="list-group-item bg-dark text-white">11:10:00 - System Heartbeat OK</li>
-            </ul>
+
+    <div class="col-lg-3">
+        <div class="card h-100">
+            <div class="card-header">Activity Logs</div>
+            <div class="card-body p-0">
+                <ul class="list-group list-group-flush small">
+                    <li class="list-group-item bg-transparent text-white border-secondary">
+                        <span class="text-info">[11:45]</span> System Booted Successfully
+                    </li>
+                    <li class="list-group-item bg-transparent text-white border-secondary">
+                        <span class="text-info">[11:47]</span> Camera 01 Connection Established
+                    </li>
+                    <li class="list-group-item bg-transparent text-warning border-secondary">
+                        <span class="text-warning">[11:48]</span> Motion Detected: Zone 2
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>
