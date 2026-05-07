@@ -4,6 +4,8 @@ from datetime import datetime
 class AuditLog(db.Model):
     id = db.Column(db.Integer, primary_key=True)
 
+    username = db.Column(db.String(150))
+
     action = db.Column(db.String(255))
 
     ip_address = db.Column(db.String(50))
