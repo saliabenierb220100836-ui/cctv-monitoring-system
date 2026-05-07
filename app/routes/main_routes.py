@@ -1,4 +1,4 @@
-from flask import render_template, redirect, url_for, request, flash, Blueprint, make_response
+from flask import render_template, redirect, url_for, request, flash, Blueprint, make_response, session
 from flask_login import login_user, logout_user, login_required, current_user
 from app.models.user import User  
 from app.models.log import AuditLog # Import your log model
@@ -15,7 +15,8 @@ def login():
         
         # Use the new check_password method
         if user and user.check_password(password):
-            login_user(user)
+            session.permanent = False
+            login_user(user, remember=False)
             
             # --- ADD REAL LOG HERE ---
             new_log = AuditLog(action=f"User {username} logged in", ip_address=request.remote_addr)
@@ -37,6 +38,15 @@ def index():
     # Fetch real logs from DB to show on dashboard
     logs = AuditLog.query.order_by(AuditLog.timestamp.desc()).limit(10).all()
     return render_template('dashboard.html', logs=logs)
+
+@main.route('/logout')
+def logout():
+    logout_user()
+    response = make_response(redirect(url_for('main.login')))
+    response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+    response.headers['Pragma'] = 'no-cache'
+    response.headers['Expires'] = '0'
+    return response
 
 # Update your setup route to use hashing
 @main.route('/setup-database-xyz')
