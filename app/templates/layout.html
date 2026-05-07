@@ -55,14 +55,14 @@
                 <div class="text-xs text-slate-400 font-medium">Philippine Standard Time (PHT)</div>
             </header>
             <div class="p-8">
-                {% block content %}{% endblock %}
+                {% block authenticated_content %}{% endblock %}
             </div>
         </main>
     </div>
     {% else %}
     <div class="min-h-screen flex items-center justify-center p-6 bg-[#0f172a]">
         <div class="w-full max-w-md">
-            {% block content %}{% endblock %}
+            {% block unauthenticated_content %}{% endblock %}
         </div>
     </div>
     {% endif %}
