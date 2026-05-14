@@ -5,32 +5,33 @@ from flask_login import LoginManager
 from config import Config
 from sqlalchemy import inspect, text
 
-
 db = SQLAlchemy()
 login_manager = LoginManager()
-
 
 @login_manager.user_loader
 def load_user(user_id):
     from app.models.user import User
     return User.query.get(int(user_id))
 
-
 def ensure_database_schema():
     inspector = inspect(db.engine)
+    # Ensure the table exists before checking columns
     if 'audit_log' in inspector.get_table_names():
         columns = [column['name'] for column in inspector.get_columns('audit_log')]
         if 'user_id' not in columns:
             with db.engine.connect() as connection:
                 connection.execute(text('ALTER TABLE audit_log ADD COLUMN user_id INTEGER'))
                 connection.commit()
+    
+    # create_all is safe to call; it won't recreate existing tables
     db.create_all()
-
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
-    app.secret_key = os.environ.get("SECRET_KEY")
+    
+    # Use Railway's environment variables
+    app.secret_key = os.environ.get("SECRET_KEY", "dev-key-123")
     app.jinja_env.cache = {}
 
     db.init_app(app)
@@ -41,9 +42,9 @@ def create_app():
     login_manager.login_message_category = 'error'
 
     with app.app_context():
+        # This handles the specific user_id requirement you added
         ensure_database_schema()
 
-    # Blueprint registration
     from app.routes.main_routes import main
     app.register_blueprint(main)
 
