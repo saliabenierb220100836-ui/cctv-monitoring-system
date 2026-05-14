@@ -14,16 +14,13 @@ def load_user(user_id):
     return User.query.get(int(user_id))
 
 def ensure_database_schema():
-    inspector = inspect(db.engine)
-    # Safely check for the audit_log table before altering it
-    if 'audit_log' in inspector.get_table_names():
-        columns = [column['name'] for column in inspector.get_columns('audit_log')]
-        if 'user_id' not in columns:
-            with db.engine.connect() as connection:
+    with db.engine.connect() as connection:
+        inspector = inspect(db.engine)
+        if 'audit_log' in inspector.get_table_names():
+            columns = [col['name'] for col in inspector.get_columns('audit_log')]
+            if 'user_id' not in columns:
                 connection.execute(text('ALTER TABLE audit_log ADD COLUMN user_id INTEGER'))
                 connection.commit()
-    
-    # This creates all tables defined in your models if they don't exist
     db.create_all()
 
 def create_app():
