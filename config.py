@@ -4,19 +4,25 @@ from dotenv import load_dotenv
 load_dotenv()
 
 class Config:
-    # Safely retrieve the Railway DATABASE_URL
-    raw_uri = os.environ.get('DATABASE_URL') or 'sqlite:///site.db'
+    # 1. Prioritize the Railway Environment Variable
+    uri = os.environ.get('DATABASE_URL')
     
-    # Fix protocol prefix for SQLAlchemy compatibility
-    if raw_uri.startswith("postgres://"):
-        raw_uri = raw_uri.replace("postgres://", "postgresql://", 1)
+    # 2. If URI is missing (local dev), fallback to SQLite
+    if not uri:
+        uri = 'sqlite:///site.db'
     
-    SQLALCHEMY_DATABASE_URI = raw_uri
+    # 3. Fix the 'postgres://' vs 'postgresql://' issue for SQLAlchemy 1.4+
+    if uri.startswith("postgres://"):
+        uri = uri.replace("postgres://", "postgresql://", 1)
+    
+    SQLALCHEMY_DATABASE_URI = uri
     SQLALCHEMY_TRACK_MODIFICATIONS = False
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'default-dev-key'
+    SECRET_KEY = os.environ.get('SECRET_KEY', 'dev-key-123')
 
-    # Ensure SSL is used for the remote PostgreSQL connection
-    if SQLALCHEMY_DATABASE_URI.startswith('postgresql'):
+    # 4. Mandatory SSL for Railway PostgreSQL
+    if "postgresql" in SQLALCHEMY_DATABASE_URI:
         SQLALCHEMY_ENGINE_OPTIONS = {
-            "connect_args": {"sslmode": "require"}
+            "connect_args": {
+                "sslmode": "require"
+            }
         }
