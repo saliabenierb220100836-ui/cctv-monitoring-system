@@ -15,7 +15,7 @@ def load_user(user_id):
 
 def ensure_database_schema():
     inspector = inspect(db.engine)
-    # Ensure the table exists before checking columns
+    # Safely check for the audit_log table before altering it
     if 'audit_log' in inspector.get_table_names():
         columns = [column['name'] for column in inspector.get_columns('audit_log')]
         if 'user_id' not in columns:
@@ -23,26 +23,20 @@ def ensure_database_schema():
                 connection.execute(text('ALTER TABLE audit_log ADD COLUMN user_id INTEGER'))
                 connection.commit()
     
-    # create_all is safe to call; it won't recreate existing tables
+    # This creates all tables defined in your models if they don't exist
     db.create_all()
 
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
     
-    # Use Railway's environment variables
-    app.secret_key = os.environ.get("SECRET_KEY", "dev-key-123")
-    app.jinja_env.cache = {}
-
     db.init_app(app)
     login_manager.init_app(app)
 
     login_manager.login_view = 'main.login'
-    login_manager.login_message = ''
     login_manager.login_message_category = 'error'
 
     with app.app_context():
-        # This handles the specific user_id requirement you added
         ensure_database_schema()
 
     from app.routes.main_routes import main
@@ -51,8 +45,6 @@ def create_app():
     @app.after_request
     def add_no_cache_headers(response):
         response.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate, max-age=0'
-        response.headers['Pragma'] = 'no-cache'
-        response.headers['Expires'] = '0'
         return response
 
     return app
