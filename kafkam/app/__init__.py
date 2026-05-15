@@ -21,13 +21,11 @@ def create_app():
     login_manager.login_view = 'main.login'
     login_manager.login_message = ''
 
+    with app.app_context():
+        db.create_all()
+
     from app.routes.main_routes import main
     app.register_blueprint(main)
-
-    with app.app_context():
-        from app.models.user import User
-        from app.models.log import AuditLog
-        db.create_all()
 
     @app.after_request
     def add_no_cache(response):
